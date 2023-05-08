@@ -24,26 +24,17 @@ namespace Prueba.Servicios
             //obtengo una asteroides de las fechas con su respectiva informacion
             var listaFechas = jsonObject["near_earth_objects"];
             List<Asteroide> asteroides = new List<Asteroide>();
-
             var valoresListaFecha = listaFechas.Values();
 
             foreach (var elementoFecha in valoresListaFecha)
             {
                 //var elemento = elementoFecha.Values();
                 var elementosChildren = elementoFecha.Children();
-
                 foreach(var elemento in elementosChildren) {
                     var elementoObject = elemento.ToObject<ApiModel>();
-
                     if (elementoObject.Is_potentially_hazardous_asteroid)
                     {
-                        Asteroide asteroide = new Asteroide();
-                        asteroide.Nombre = elementoObject.Name;
-                        asteroide.Diametro = CalcularDiametro(elementoObject.Estimated_Diameter.Kilometers.Estimated_diameter_min,
-                            elementoObject.Estimated_Diameter.Kilometers.Estimated_diameter_max);
-                        asteroide.Velocidad = elementoObject.Close_approach_data[0].Relative_velocity.Kilometers_per_hour;
-                        asteroide.Fecha = elementoObject.Close_approach_data[0].Close_approach_date;
-                        asteroide.Planeta = elementoObject.Close_approach_data[0].Orbiting_body;
+                        Asteroide asteroide = ParseToAsteroide(elementoObject);
                         asteroides.Add(asteroide);
                     }
                 }
@@ -56,6 +47,18 @@ namespace Prueba.Servicios
         {
             float diametroMedio = max - min;
             return diametroMedio;
+        }
+
+        private static Asteroide ParseToAsteroide(ApiModel modelo) {
+            Asteroide asteroide = new Asteroide();
+            asteroide.Nombre = modelo.Name;
+            asteroide.Diametro = CalcularDiametro(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,
+                modelo.Estimated_Diameter.Kilometers.Estimated_diameter_max);
+            asteroide.Velocidad = modelo.Close_approach_data[0].Relative_velocity.Kilometers_per_hour;
+            asteroide.Fecha = modelo.Close_approach_data[0].Close_approach_date;
+            asteroide.Planeta = modelo.Close_approach_data[0].Orbiting_body;
+
+            return asteroide;
         }
     }
 }

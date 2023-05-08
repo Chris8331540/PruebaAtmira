@@ -13,23 +13,28 @@ using System.Collections.Generic;
 using Prueba.Modelos;
 using Newtonsoft.Json;
 using Prueba.Servicios;
+using System.Linq;
 
 namespace Prueba.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Principal : ControllerBase
+    public class Asteroids : ControllerBase
     {
         private static HttpClient httpClient = new HttpClient();
         private readonly string _rutaJson = "C:\\Users\\christopher.mendoza\\Downloads\\testJson.json";
         private readonly IServicio _servicio;
 
-        public Principal(IServicio servicio)
+        public Asteroids(IServicio servicio)
         {
             _servicio = servicio;
         }
         [HttpGet("{dias:int}")]
         public async Task<IActionResult> Get(int dias) {
+
+            if (dias <= 0 && dias > 7) {
+                return BadRequest("Cantidad de días equivocado");
+            }
             //DateTime hoy  = DateTime.Now;
             //DateTime fechaFinal = hoy.AddDays(dias);
             //string fechaHoyString = hoy.ToString("yyyy-MM-dd");
@@ -42,8 +47,9 @@ namespace Prueba.Controllers
             string json = System.IO.File.ReadAllText(_rutaJson);
 
             List<Asteroide> asteriodes = _servicio.GetAsteroides(json);
+            
 
-            string jsonAsteriodes = JsonConvert.SerializeObject(asteriodes);
+            string jsonAsteriodes = JsonConvert.SerializeObject(asteriodes.OrderBy(x=>x.Diametro).Take(3).ToList());
 
 
             return Ok(jsonAsteriodes);
