@@ -28,7 +28,7 @@ namespace Prueba.Controllers
         {
             _servicio = servicio;
         }
-        [HttpGet("{dias:int}")]
+        [HttpGet]
         public async Task<IActionResult> Get(int dias)
         {
 

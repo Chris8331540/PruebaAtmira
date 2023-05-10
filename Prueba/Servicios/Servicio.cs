@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using System.Linq;
 
 namespace Prueba.Servicios
 {
@@ -30,9 +31,10 @@ namespace Prueba.Servicios
             //obtengo una asteroides de las fechas con su respectiva informacion
             var listaFechas = jsonObject["near_earth_objects"];
             List<Asteroide> asteroides = new List<Asteroide>();
-            var valoresListaFecha = listaFechas.Values();
-            if (listaFechas.HasValues)
+
+            if (listaFechas != null)
             {
+                var valoresListaFecha = listaFechas.Values();
                 foreach (var elementoFecha in valoresListaFecha)
                 {
                     //var elemento = elementoFecha.Values();
@@ -53,7 +55,8 @@ namespace Prueba.Servicios
             return asteroides;
         }
 
-        public async Task<string> RealizarPeticion(int dias) {
+        public async Task<string> RealizarPeticion(int dias)
+        {
             DateTime hoy = DateTime.Now;
             DateTime fechaFinal = hoy.AddDays(dias);
             string start_date = hoy.ToString("yyyy-MM-dd");
@@ -66,9 +69,9 @@ namespace Prueba.Servicios
             return json;
         }
 
-        private static double CalcularDiametro(float min, float max)
+        private static double CalcularDiametroMedio(float min, float max)
         {
-            float diametroMedio = max - min;
+            float diametroMedio = (max + min) / 2;
             return diametroMedio;
         }
 
@@ -76,7 +79,7 @@ namespace Prueba.Servicios
         {
             Asteroide asteroide = new Asteroide();
             asteroide.Nombre = modelo.Name;
-            asteroide.Diametro = CalcularDiametro(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,
+            asteroide.Diametro = CalcularDiametroMedio(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,
                 modelo.Estimated_Diameter.Kilometers.Estimated_diameter_max);
             asteroide.Velocidad = modelo.Close_approach_data[0].Relative_velocity.Kilometers_per_hour;
             asteroide.Fecha = modelo.Close_approach_data[0].Close_approach_date;
