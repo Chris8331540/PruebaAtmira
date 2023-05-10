@@ -19,12 +19,12 @@ namespace Prueba.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Asteroids : ControllerBase
+    public class AsteroidsController : ControllerBase
     {
 
         private readonly IServicio _servicio;
 
-        public Asteroids(IServicio servicio)
+        public AsteroidsController(IServicio servicio)
         {
             _servicio = servicio;
         }

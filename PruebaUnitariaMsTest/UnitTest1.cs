@@ -16,12 +16,12 @@ namespace PruebaUnitariaMsTest
     {
         private IEnumerable<int> valoresDePrueba;
         private readonly Servicio _servicio;
-        private readonly Asteroids asteroids;
+        private readonly AsteroidsController asteroids;
         public UnitTest1()
         {
             _servicio = new Servicio();
             valoresDePrueba = Enumerable.Range(1, 7);
-            asteroids = new Asteroids(_servicio);
+            asteroids = new AsteroidsController(_servicio);
         }
 
 
