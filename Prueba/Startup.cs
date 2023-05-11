@@ -28,6 +28,8 @@ namespace Prueba
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IPeticionServicio, PeticionServicio>();
+            services.AddTransient<IAsteroidesServicio, AsteroidesServicio>();
+            services.AddTransient<IParseToServicio, ParseToServicio>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
