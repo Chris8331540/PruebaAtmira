@@ -15,14 +15,68 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 
 namespace TestMock
 {
     [TestClass]
     public class UnitTest1
     {
-        private readonly string _rutaJson = "C:\\Users\\christopher.mendoza\\Downloads\\testJson.json";
-        private readonly string _rutaResultado = "C:\\Users\\christopher.mendoza\\Downloads\\resultado.json";//3 dias
+        //private readonly string _rutaJson = "C:\\Users\\christopher.mendoza\\Downloads\\testJson.json";
+        private readonly string _rutaJson = "../../../../Prueba/ArchivoJson/testJson2.json";//1 dia
+        Mock<IPeticionServicio> peticionServicio;
+        Mock<IAsteroidesServicio> asteroidesServicio;
+        Mock<IParseToServicio> parseToServicio = new Mock<IParseToServicio>();
+        public UnitTest1()
+        {
+            peticionServicio = new Mock<IPeticionServicio>();
+            asteroidesServicio = new Mock<IAsteroidesServicio>();
+            parseToServicio = new Mock<IParseToServicio>();
+        }
+
+        [TestMethod]
+        public async Task PruebaAsteroideControllerFailDias() {
+            int dias = 10;
+
+            AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
+            var response = await asteriods.Get(dias);
+
+            Assert.IsInstanceOfType(response, typeof(ContentResult));
+
+
+            var result = (ContentResult)response;
+            var statusCode = result.StatusCode;
+            Assert.AreNotEqual(200, statusCode);
+        }
+
+        [TestMethod]
+        public async Task PruebaAsteroideControllerFailApiNasa() {
+            int dias = 7;
+            string archivo = File.ReadAllText(_rutaJson);
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Content = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    code = 400,
+                    http_error = "BAD_REQUEST",
+                    error_message = "Error X"
+                })),
+            });
+
+            AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
+            var response = await asteriods.Get(dias);
+
+            Assert.IsInstanceOfType(response, typeof(ContentResult));
+
+
+            var result = (ContentResult)response;
+            var statusCode = result.StatusCode;
+            Assert.AreNotEqual(200, statusCode);
+            peticionServicio.Verify();
+
+        }
 
         [TestMethod]
         public async Task PruebaAsteroidController()
@@ -30,11 +84,12 @@ namespace TestMock
 
             int dias = 7;
             string archivo = File.ReadAllText(_rutaJson);
-            Mock<IPeticionServicio> peticionServicio = new Mock<IPeticionServicio>();
-            Mock<IAsteroidesServicio> asteroidesServicio = new Mock<IAsteroidesServicio>();
-            Mock<IParseToServicio> parseToServicio = new Mock<IParseToServicio>();
 
-            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>())).ReturnsAsync(archivo);
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(archivo)
+            });
 
             parseToServicio
             .Setup(p => p.ParseToAsteroide(It.IsAny<ApiModel>()))
@@ -48,11 +103,18 @@ namespace TestMock
                 Planeta = modelo.Close_approach_data[0].Orbiting_body
             });
             
-            asteroidesServicio.Setup(a => a.GetAsteroides(It.IsAny<string>())).Returns(GetAsteroidesDePrueba(archivo));
+            asteroidesServicio.Setup(a => a.GetAsteroides(It.IsAny<string>())).Returns(GetAsteroidesDePrueba());
 
             AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
             var response = await asteriods.Get(dias);
-            Assert.IsInstanceOfType(response, typeof(OkObjectResult));
+
+            Assert.IsInstanceOfType(response, typeof(ContentResult));
+
+
+            var result = (ContentResult)response;
+            var statusCode = result.StatusCode;
+            Assert.AreEqual(200, statusCode);
+
             peticionServicio.Verify();
             parseToServicio.Verify();
             asteroidesServicio.Verify();
@@ -65,41 +127,17 @@ namespace TestMock
             return diametroMedio;
         }
 
-        List<Asteroide> GetAsteroidesDePrueba(string json)
+        List<Asteroide> GetAsteroidesDePrueba()
         {
-            JObject jsonObject = JObject.Parse(json);
-            //obtengo una asteroides de las fechas con su respectiva informacion
-            var listaFechas = jsonObject["near_earth_objects"];
-            List<Asteroide> asteroides = new List<Asteroide>();
-
-            if (listaFechas != null)
-            {
-                var valoresListaFecha = listaFechas.Values();
-                foreach (var elementoFecha in valoresListaFecha)
-                {
-                    //var elemento = elementoFecha.Values();
-                    var elementosChildren = elementoFecha.Children();
-                    foreach (var elemento in elementosChildren)
-                    {
-                        var elementoObject = elemento.ToObject<ApiModel>();
-                        if (elementoObject.Is_potentially_hazardous_asteroid)
-                        {
-                            var asteroidePrueba = new Asteroide
-                            {
-                                Nombre = elementoObject.Name,
-                                Diametro = CalcularDiametroMedio(elementoObject.Estimated_Diameter.Kilometers.Estimated_diameter_min,
-                    elementoObject.Estimated_Diameter.Kilometers.Estimated_diameter_max),
-                                Velocidad = elementoObject.Close_approach_data[0].Relative_velocity.Kilometers_per_hour,
-                                Fecha = elementoObject.Close_approach_data[0].Close_approach_date,
-                                Planeta = elementoObject.Close_approach_data[0].Orbiting_body
-                            };
-
-                            asteroides.Add(asteroidePrueba);
-                        }
-                    }
+            List<Asteroide> asteroides = new List<Asteroide>() { 
+                new Asteroide(){ 
+                    Nombre = "467460 (2006 JF42)",
+                    Diametro = CalcularDiametroMedio((float)0.407901194,(float)0.912094798),
+                    Velocidad = 99331.0754164726,
+                    Fecha = DateTime.Parse("2023-05-11"),
+                    Planeta = "Earth"
                 }
-            }
-
+            };
 
             return asteroides;
         }
