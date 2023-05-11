@@ -33,8 +33,12 @@ namespace PruebaUnitariaMsTest
         }
 
 
+        /// <summary>
+        /// Comprueba la llamada al controlador pasando un dia valido y verifica que recibe una respuesta valida (200)
+        /// </summary>
+        /// <param name="dias">Cantidad de dias</param>
+        /// <returns></returns>
         [TestMethod]
-        //[DynamicData(nameof(valoresDePrueba))]
         [DataRow(1)]
         public async Task ComprobarControladorPeticionCorrecta(int dias)
         {
@@ -43,8 +47,12 @@ namespace PruebaUnitariaMsTest
             Assert.AreEqual(200, (int)response.StatusCode);
         }
 
+        /// <summary>
+        /// Comprueba una llamada al controlador pasando un dia invalido y verifica que recibe una respuesta no valida (400)
+        /// </summary>
+        /// <param name="dias">Cantidad de dias</param>
+        /// <returns></returns>
         [TestMethod]
-        //[DynamicData(nameof(valoresDePrueba))]
         [DataRow(0)]
         public async Task ComprobarControladorPeticionIncorrecta(int dias)
         {
@@ -53,6 +61,11 @@ namespace PruebaUnitariaMsTest
             Assert.AreEqual(400, (int)response.StatusCode);
         }
 
+        /// <summary>
+        /// Comprueba una llamda a la api de la Nasa y verifica que recibe una respuesta válida (200)
+        /// </summary>
+        /// <param name="dias">Cantidad de dias</param>
+        /// <returns></returns>
         [TestMethod]
         [DataRow(2)]
         public async Task ComprobarPeticionApiNasa(int dias) {
@@ -60,6 +73,12 @@ namespace PruebaUnitariaMsTest
             Assert.AreEqual(200, (int)response.StatusCode);
 
         }
+
+        /// <summary>
+        /// Comprueba una llamada a la api de la Nasa y verifica que recibe una respuesta no válida (!=200)
+        /// </summary>
+        /// <param name="dias">Cantidad de dias</param>
+        /// <returns></returns>
         [TestMethod]
         [DataRow(2)]
         public async Task ComprobarPeticionApiNasaFail(int dias)
@@ -68,7 +87,9 @@ namespace PruebaUnitariaMsTest
             Assert.AreNotEqual(200, (int)response.StatusCode);
 
         }
-
+        /// <summary>
+        /// Comprueba que la conversión de un ApiModel de ejemplo a Asteroide concuerda con el Asteroide esperado
+        /// </summary>
         [TestMethod]
         public void ComprobarParseAsteriode() { 
             ApiModel model= GetApiModeloEjemplo();
@@ -82,6 +103,10 @@ namespace PruebaUnitariaMsTest
             Assert.AreEqual(asteroide.Fecha, asteroideEjemplo.Fecha);
         }
 
+        /// <summary>
+        /// Metodo que crea un objeto Asteroide
+        /// </summary>
+        /// <returns>Retorna un objeto Asteroide</returns>
         private Asteroide GetAsteroideDeEjemplo() {
             Asteroide asteroide = new Asteroide()
             {
@@ -93,13 +118,22 @@ namespace PruebaUnitariaMsTest
             };
             return asteroide;
         }
-
+        /// <summary>
+        /// Calcula la media del Diametro
+        /// </summary>
+        /// <param name="min">Diametro mínimo</param>
+        /// <param name="max">Diametro máximo</param>
+        /// <returns>Retorna un double que representa la media del diametro minimo y maximo</returns>
         private static double CalcularDiametroMedio(float min, float max)
         {
             float diametroMedio = (max + min) / 2;
             return diametroMedio;
         }
 
+        /// <summary>
+        /// Método que crea un objeto ApiModelo de ejemplo
+        /// </summary>
+        /// <returns>Retorna un objeto ApiModelo</returns>
         private ApiModel GetApiModeloEjemplo()
         {
             ApiModel model = new ApiModel()

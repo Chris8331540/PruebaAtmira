@@ -36,6 +36,10 @@ namespace TestMock
             parseToServicio = new Mock<IParseToServicio>();
         }
 
+        /// <summary>
+        /// Simula una llamada a mi controlador, con una cantidad de días no válida
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task PruebaAsteroideControllerFailDias() {
             int dias = 10;
@@ -51,6 +55,10 @@ namespace TestMock
             Assert.AreNotEqual(200, statusCode);
         }
 
+        /// <summary>
+        /// Simula una llamada a la Api de la Nasa y esta retorna un StatusCode != 200
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task PruebaAsteroideControllerFailApiNasa() {
             int dias = 7;
@@ -79,6 +87,10 @@ namespace TestMock
 
         }
 
+        /// <summary>
+        /// Simula la llamada al controlador, pasando un valor válido
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task PruebaAsteroidController()
         {
@@ -122,13 +134,23 @@ namespace TestMock
 
         }
 
+        /// <summary>
+        /// Método que calcula la media de los diametros minimo y maximo
+        /// </summary>
+        /// <param name="min">Diametro mínimo</param>
+        /// <param name="max">Diametro máximo</param>
+        /// <returns></returns>
         private static double CalcularDiametroMedio(float min, float max)
         {
             float diametroMedio = (max + min) / 2;
             return diametroMedio;
         }
 
-        List<Asteroide> GetAsteroidesDePrueba()
+        /// <summary>
+        /// Devuelve una lista de asteroides de prueba, en concordancia con el json de prueba
+        /// </summary>
+        /// <returns>Lista de Asteroides</returns>
+        private List<Asteroide> GetAsteroidesDePrueba()
         {
             List<Asteroide> asteroides = new List<Asteroide>() { 
                 new Asteroide(){ 
