@@ -22,11 +22,13 @@ namespace Prueba.Controllers
     public class AsteroidsController : ControllerBase
     {
 
-        private readonly IServicio _servicio;
+        private readonly IPeticionServicio _peticionServicio;
+        private readonly IAsteroidesServicio _asteroidesServicio;
 
-        public AsteroidsController(IServicio servicio)
+        public AsteroidsController(IPeticionServicio peticionServicio, IAsteroidesServicio asteroidesServicio)
         {
-            _servicio = servicio;
+            _peticionServicio = peticionServicio;
+            _asteroidesServicio = asteroidesServicio;
         }
         [HttpGet]
         public async Task<IActionResult> Get(int dias)
@@ -37,8 +39,8 @@ namespace Prueba.Controllers
                 return BadRequest("Cantidad de días equivocado");
             }
 
-            string json = await _servicio.RealizarPeticion(dias);
-            List<Asteroide> asteriodes = _servicio.GetAsteroides(json);
+            string json = await _peticionServicio.RealizarPeticion(dias);
+            List<Asteroide> asteriodes = _asteroidesServicio.GetAsteroides(json);
             string jsonAsteriodes = JsonConvert.SerializeObject(asteriodes.OrderBy(x => x.Diametro).Take(3).ToList());
 
             return Ok(jsonAsteriodes);
