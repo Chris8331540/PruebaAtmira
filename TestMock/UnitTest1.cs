@@ -28,6 +28,7 @@ namespace TestMock
         Mock<IPeticionServicio> peticionServicio;
         Mock<IAsteroidesServicio> asteroidesServicio;
         Mock<IParseToServicio> parseToServicio = new Mock<IParseToServicio>();
+        private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
         public UnitTest1()
         {
             peticionServicio = new Mock<IPeticionServicio>();
@@ -54,7 +55,7 @@ namespace TestMock
         public async Task PruebaAsteroideControllerFailApiNasa() {
             int dias = 7;
             string archivo = File.ReadAllText(_rutaJson);
-            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage()
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url)).ReturnsAsync(new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Content = new StringContent(JsonConvert.SerializeObject(new
@@ -85,7 +86,7 @@ namespace TestMock
             int dias = 7;
             string archivo = File.ReadAllText(_rutaJson);
 
-            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>())).ReturnsAsync(new HttpResponseMessage()
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url)).ReturnsAsync(new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(archivo)

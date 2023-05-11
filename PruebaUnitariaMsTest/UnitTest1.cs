@@ -18,17 +18,17 @@ namespace PruebaUnitariaMsTest
     [TestClass]
     public class UnitTest1
     {
-        private IEnumerable<int> valoresDePrueba;
         private readonly PeticionServicio _peticionServicio;
         private readonly ParseToServicio _parseToServicio;
         private readonly AsteroidesServicio _asteroidesServicio;
         private readonly AsteroidsController asteroids;
+        private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
+        private static readonly string _urlFail = "https://api.nasa.gov/neo/rest/v1/";
         public UnitTest1()
         {
             _peticionServicio = new PeticionServicio();
             _parseToServicio = new ParseToServicio();
             _asteroidesServicio = new AsteroidesServicio(_parseToServicio);
-            valoresDePrueba = Enumerable.Range(1, 7);
             asteroids = new AsteroidsController(_peticionServicio, _asteroidesServicio);
         }
 
@@ -56,8 +56,16 @@ namespace PruebaUnitariaMsTest
         [TestMethod]
         [DataRow(2)]
         public async Task ComprobarPeticionApiNasa(int dias) {
-            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias);
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
             Assert.AreEqual(200, (int)response.StatusCode);
+
+        }
+        [TestMethod]
+        [DataRow(2)]
+        public async Task ComprobarPeticionApiNasaFail(int dias)
+        {
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _urlFail);
+            Assert.AreNotEqual(200, (int)response.StatusCode);
 
         }
 

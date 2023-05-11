@@ -24,7 +24,7 @@ namespace Prueba.Controllers
 
         private readonly IPeticionServicio _peticionServicio;
         private readonly IAsteroidesServicio _asteroidesServicio;
-
+        private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
         public AsteroidsController(IPeticionServicio peticionServicio, IAsteroidesServicio asteroidesServicio)
         {
             _peticionServicio = peticionServicio;
@@ -54,7 +54,7 @@ namespace Prueba.Controllers
                 };
             }
             //recibo el response de la petición a la api de la Nasa
-            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias);
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
             if (response.IsSuccessStatusCode)//si recibo una respuesta válida continuo la operacion normal
             {
                 List<Asteroide> asteriodes = _asteroidesServicio.GetAsteroides(await response.Content.ReadAsStringAsync());

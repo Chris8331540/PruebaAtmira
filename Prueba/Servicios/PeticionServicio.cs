@@ -18,23 +18,22 @@ namespace Prueba.Servicios
     public interface IPeticionServicio
     {
         
-        Task<HttpResponseMessage> RealizarPeticion(int dias);
+        Task<HttpResponseMessage> RealizarPeticion(int dias, string url);
     }
     public class PeticionServicio : IPeticionServicio
     {
         private static HttpClient httpClient = new HttpClient();
-        private static readonly string _url="https://api.nasa.gov/neo/rest/v1/feed?";
         
 
-        public async Task<HttpResponseMessage> RealizarPeticion(int dias)
+        public async Task<HttpResponseMessage> RealizarPeticion(int dias, string url)
         {
             DateTime hoy = DateTime.Now;
             DateTime fechaFinal = hoy.AddDays(dias);
             string start_date = hoy.ToString("yyyy-MM-dd");
             string end_date = fechaFinal.ToString("yyyy-MM-dd");
-            string url = $"{_url}start_date={start_date}&end_date={end_date}&api_key=DEMO_KEY";
+            string urlFinal = $"{url}start_date={start_date}&end_date={end_date}&api_key=DEMO_KEY";
 
-            HttpResponseMessage response = await httpClient.GetAsync(url);
+            HttpResponseMessage response = await httpClient.GetAsync(urlFinal);
 
             return response;
         }
