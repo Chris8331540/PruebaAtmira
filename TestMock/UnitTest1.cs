@@ -23,7 +23,6 @@ namespace TestMock
     [TestClass]
     public class UnitTest1
     {
-        //private readonly string _rutaJson = "C:\\Users\\christopher.mendoza\\Downloads\\testJson.json";
         private readonly string _rutaJson = "../../../../Prueba/ArchivoJson/testJson2.json";//1 dia
         Mock<IPeticionServicio> peticionServicio;
         Mock<IAsteroidesServicio> asteroidesServicio;
@@ -104,9 +103,7 @@ namespace TestMock
                 Content = new StringContent(archivo)
             });
 
-            parseToServicio
-            .Setup(p => p.ParseToAsteroide(It.IsAny<ApiModel>()))
-            .Returns((ApiModel modelo) => new Asteroide
+            parseToServicio.Setup(p => p.ParseToAsteroide(It.IsAny<ApiModel>())).Returns((ApiModel modelo) => new Asteroide
             {
                 Nombre = modelo.Name,
                 Diametro = CalcularDiametroMedio(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,

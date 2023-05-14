@@ -25,6 +25,12 @@ namespace Prueba.Servicios
         private static HttpClient httpClient = new HttpClient();
         
 
+        /// <summary>
+        /// Realiza la petición a la api de la Nasa y devuelve la respuesta recibida.
+        /// </summary>
+        /// <param name="dias">Cantidad de días</param>
+        /// <param name="url">Url de la petición</param>
+        /// <returns>Devuelve un objeto HttpResponseMessage</returns>
         public async Task<HttpResponseMessage> RealizarPeticion(int dias, string url)
         {
             DateTime hoy = DateTime.Now;

@@ -8,13 +8,23 @@ namespace Prueba.Servicios
     }
     public class ParseToServicio:IParseToServicio
     {
-
+        /// <summary>
+        /// Calcula el diametro medio que hay entre un diametro minimo y máximo
+        /// </summary>
+        /// <param name="min">Diámetro mínimo</param>
+        /// <param name="max">Diámetro máximo</param>
+        /// <returns>El resultado de calcular el diametro medio.</returns>
         private static double CalcularDiametroMedio(float min, float max)
         {
             float diametroMedio = (max + min) / 2;
             return diametroMedio;
         }
 
+        /// <summary>
+        /// Tranforma un objeto apiModel a Asteroide
+        /// </summary>
+        /// <param name="modelo">objeto apiModel</param>
+        /// <returns>Devuelve un objeto Asteroide</returns>
         public Asteroide ParseToAsteroide(ApiModel modelo)
         {
             Asteroide asteroide = new Asteroide();
