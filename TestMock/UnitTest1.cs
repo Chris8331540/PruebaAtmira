@@ -28,6 +28,8 @@ namespace TestMock
         Mock<IAsteroidesServicio> asteroidesServicio;
         Mock<IParseToServicio> parseToServicio = new Mock<IParseToServicio>();
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
+
+        //TODO: Está bien, pero falta mockear el httpClient del servicio para ver como funciona ese servicio con json falso de la nasa
         public UnitTest1()
         {
             peticionServicio = new Mock<IPeticionServicio>();
@@ -131,6 +133,7 @@ namespace TestMock
 
         }
 
+        //TODO: Todo lo que no sea un TEST, no debe ir en una clase/archivo de tests, esta lógica está bien pero extráela
         /// <summary>
         /// Método que calcula la media de los diametros minimo y maximo
         /// </summary>

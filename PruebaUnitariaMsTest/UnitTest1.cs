@@ -16,6 +16,8 @@ using System;
 namespace PruebaUnitariaMsTest
 {
     [TestClass]
+    //TODO: parece tontería pero el nombre de las clases debe de ser identificativo
+    //tu clase de test unitarios se llama igual que tu clase de test de mock
     public class UnitTest1
     {
         private readonly PeticionServicio _peticionServicio;
@@ -102,7 +104,7 @@ namespace PruebaUnitariaMsTest
             Assert.AreEqual(asteroide.Planeta, asteroideEjemplo.Planeta);
             Assert.AreEqual(asteroide.Fecha, asteroideEjemplo.Fecha);
         }
-
+        //TODO: Todo lo que no sea un TEST, no debe ir en una clase/archivo de tests, esta lógica está bien pero extráela
         /// <summary>
         /// Metodo que crea un objeto Asteroide
         /// </summary>

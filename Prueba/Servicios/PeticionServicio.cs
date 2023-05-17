@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace Prueba.Servicios
 {
-
+    //TODO: no es buena práctica meter más de una clase/interfaz dentro de un archivo .cs
     public interface IPeticionServicio
     {
         

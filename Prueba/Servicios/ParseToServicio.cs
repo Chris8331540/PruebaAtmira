@@ -2,7 +2,7 @@
 
 namespace Prueba.Servicios
 {
-
+    //TODO: aquí lo mismo, hay 2 clases en 1 archivo
     public interface IParseToServicio {
         Asteroide ParseToAsteroide(ApiModel modelo);
     }

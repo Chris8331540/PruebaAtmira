@@ -53,11 +53,15 @@ namespace Prueba.Controllers
                     StatusCode = 400
                 };
             }
+            //TODO: contempla también la posibilidad de que la api de la nasa devuelva una lista vacía, en ese caso el statuscode es positivo pero no es 200,
+            //investiga el status code para una respuesta correcta pero vacía
+
             //recibo el response de la petición a la api de la Nasa
             HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
             if (response.IsSuccessStatusCode)//si recibo una respuesta válida continuo la operacion normal
             {
                 List<Asteroide> asteriodes = _asteroidesServicio.GetAsteroides(await response.Content.ReadAsStringAsync());
+                //TODO: En el controller no debes codificar lógica, la lógica para obtener solo los 3 primeros en esta aplicación debería ir en el servicio
                 string jsonAsteriodes = JsonConvert.SerializeObject(asteriodes.OrderByDescending(x => x.Diametro).Take(3).ToList());
 
                 return new ContentResult
@@ -69,6 +73,8 @@ namespace Prueba.Controllers
             }
             else//en caso contrario, devuelvo la respuesta de la api de la Nasa
             {
+                //simple y sencillo, me gusta, quizás podrías haber modificado el mensaje devuelto de la API de la nasa y ponerle
+                //algún tipo de identificador para que se sepa que lo que ha fallado es la API de la nasa pero bien
                 return new ContentResult
                 {
                     Content = await response.Content.ReadAsStringAsync(),

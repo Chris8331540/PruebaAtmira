@@ -5,6 +5,7 @@ using System.Security.Principal;
 
 namespace Prueba.Modelos
 {
+    //TODO: sólo debe haber una clase por archivo
     public class ApiModel
     {
         public string Name { get; set; }
