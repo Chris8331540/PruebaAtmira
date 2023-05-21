@@ -21,20 +21,22 @@ using System.Net;
 namespace TestMock
 {
     [TestClass]
-    public class UnitTest1
+    public class TestMock
     {
         private readonly string _rutaJson = "../../../../Prueba/ArchivoJson/testJson2.json";//1 dia
         Mock<IPeticionServicio> peticionServicio;
         Mock<IAsteroidesServicio> asteroidesServicio;
-        Mock<IParseToServicio> parseToServicio = new Mock<IParseToServicio>();
+        Mock<IParseToServicio> parseToServicio;
+        Mock<HttpClient> httpClient;
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
 
         //TODO: Está bien, pero falta mockear el httpClient del servicio para ver como funciona ese servicio con json falso de la nasa
-        public UnitTest1()
+        public TestMock()
         {
             peticionServicio = new Mock<IPeticionServicio>();
             asteroidesServicio = new Mock<IAsteroidesServicio>();
             parseToServicio = new Mock<IParseToServicio>();
+            httpClient = new Mock<HttpClient>();
         }
 
         /// <summary>
@@ -55,6 +57,29 @@ namespace TestMock
             var statusCode = result.StatusCode;
             Assert.AreNotEqual(200, statusCode);
         }
+
+        /// <summary>
+        /// Simula la llamada del metodo Realizar petición, que devuelve una respuesta Ok con el json falso de la nasa
+        /// </summary>
+        /// <returns></returns>
+        //[TestMethod]
+        //public async Task PruebaPeticionServicioHttpClient() {
+        //    string archivo = File.ReadAllText(_rutaJson);
+        //    int dias = 2;
+        //    httpClient.Setup(s=>s.GetAsync(It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage()
+        //    {
+        //        StatusCode = HttpStatusCode.OK,
+        //        Content = new StringContent(archivo)
+        //    });
+
+        //    var servicio = new PeticionServicio();
+        //    servicio.GetType().GetField("httpClient", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(servicio, httpClient.Object);
+
+        //    var response = await servicio.RealizarPeticion(dias, _url);
+        //    httpClient.Verify();
+        //    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        //}
 
         /// <summary>
         /// Simula una llamada a la Api de la Nasa y esta retorna un StatusCode != 200
@@ -108,14 +133,14 @@ namespace TestMock
             parseToServicio.Setup(p => p.ParseToAsteroide(It.IsAny<ApiModel>())).Returns((ApiModel modelo) => new Asteroide
             {
                 Nombre = modelo.Name,
-                Diametro = CalcularDiametroMedio(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,
+                Diametro = UtilidadesMock.CalcularDiametroMedio(modelo.Estimated_Diameter.Kilometers.Estimated_diameter_min,
                     modelo.Estimated_Diameter.Kilometers.Estimated_diameter_max),
                 Velocidad = modelo.Close_approach_data[0].Relative_velocity.Kilometers_per_hour,
                 Fecha = modelo.Close_approach_data[0].Close_approach_date,
                 Planeta = modelo.Close_approach_data[0].Orbiting_body
             });
             
-            asteroidesServicio.Setup(a => a.GetAsteroides(It.IsAny<string>())).Returns(GetAsteroidesDePrueba());
+            asteroidesServicio.Setup(a => a.GetAsteroides(It.IsAny<string>())).Returns(UtilidadesMock.GetAsteroidesDePrueba());
 
             AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
             var response = await asteriods.Get(dias);
@@ -133,36 +158,6 @@ namespace TestMock
 
         }
 
-        //TODO: Todo lo que no sea un TEST, no debe ir en una clase/archivo de tests, esta lógica está bien pero extráela
-        /// <summary>
-        /// Método que calcula la media de los diametros minimo y maximo
-        /// </summary>
-        /// <param name="min">Diametro mínimo</param>
-        /// <param name="max">Diametro máximo</param>
-        /// <returns></returns>
-        private static double CalcularDiametroMedio(float min, float max)
-        {
-            float diametroMedio = (max + min) / 2;
-            return diametroMedio;
-        }
-
-        /// <summary>
-        /// Devuelve una lista de asteroides de prueba, en concordancia con el json de prueba
-        /// </summary>
-        /// <returns>Lista de Asteroides</returns>
-        private List<Asteroide> GetAsteroidesDePrueba()
-        {
-            List<Asteroide> asteroides = new List<Asteroide>() { 
-                new Asteroide(){ 
-                    Nombre = "467460 (2006 JF42)",
-                    Diametro = CalcularDiametroMedio((float)0.407901194,(float)0.912094798),
-                    Velocidad = 99331.0754164726,
-                    Fecha = DateTime.Parse("2023-05-11"),
-                    Planeta = "Earth"
-                }
-            };
-
-            return asteroides;
-        }
+        
     }
 }

@@ -60,10 +60,16 @@ namespace Prueba.Controllers
             HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
             if (response.IsSuccessStatusCode)//si recibo una respuesta válida continuo la operacion normal
             {
-                List<Asteroide> asteriodes = _asteroidesServicio.GetAsteroides(await response.Content.ReadAsStringAsync());
-                //TODO: En el controller no debes codificar lógica, la lógica para obtener solo los 3 primeros en esta aplicación debería ir en el servicio
-                string jsonAsteriodes = JsonConvert.SerializeObject(asteriodes.OrderByDescending(x => x.Diametro).Take(3).ToList());
-
+                List<Asteroide> asteroides = _asteroidesServicio.GetAsteroides(await response.Content.ReadAsStringAsync());
+                string jsonAsteriodes = JsonConvert.SerializeObject(asteroides);
+                if (asteroides.Count == 0) {
+                    return new ContentResult
+                    {
+                        Content = jsonAsteriodes,
+                        ContentType = "application/json",
+                        StatusCode = 204
+                    };
+                }
                 return new ContentResult
                 {
                     Content = jsonAsteriodes,
@@ -75,10 +81,12 @@ namespace Prueba.Controllers
             {
                 //simple y sencillo, me gusta, quizás podrías haber modificado el mensaje devuelto de la API de la nasa y ponerle
                 //algún tipo de identificador para que se sepa que lo que ha fallado es la API de la nasa pero bien
+                
                 return new ContentResult
                 {
                     Content = await response.Content.ReadAsStringAsync(),
                     StatusCode = (int)response.StatusCode,
+                    
                 };
             }
 

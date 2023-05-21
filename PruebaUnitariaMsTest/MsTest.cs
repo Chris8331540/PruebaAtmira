@@ -16,9 +16,8 @@ using System;
 namespace PruebaUnitariaMsTest
 {
     [TestClass]
-    //TODO: parece tontería pero el nombre de las clases debe de ser identificativo
     //tu clase de test unitarios se llama igual que tu clase de test de mock
-    public class UnitTest1
+    public class MsTest
     {
         private readonly PeticionServicio _peticionServicio;
         private readonly ParseToServicio _parseToServicio;
@@ -26,7 +25,7 @@ namespace PruebaUnitariaMsTest
         private readonly AsteroidsController asteroids;
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
         private static readonly string _urlFail = "https://api.nasa.gov/neo/rest/v1/";
-        public UnitTest1()
+        public MsTest()
         {
             _peticionServicio = new PeticionServicio();
             _parseToServicio = new ParseToServicio();
@@ -94,80 +93,17 @@ namespace PruebaUnitariaMsTest
         /// </summary>
         [TestMethod]
         public void ComprobarParseAsteriode() { 
-            ApiModel model= GetApiModeloEjemplo();
+            ApiModel model= UtilidadesMsTest.GetApiModeloEjemplo();
             Asteroide asteroide = _parseToServicio.ParseToAsteroide(model);
 
-            Asteroide asteroideEjemplo = GetAsteroideDeEjemplo();
+            Asteroide asteroideEjemplo = UtilidadesMsTest.GetAsteroideDeEjemplo();
             Assert.AreEqual(asteroide.Nombre, asteroideEjemplo.Nombre);
             Assert.AreEqual(asteroide.Velocidad, asteroideEjemplo.Velocidad);
             Assert.AreEqual(asteroide.Diametro, asteroideEjemplo.Diametro);
             Assert.AreEqual(asteroide.Planeta, asteroideEjemplo.Planeta);
             Assert.AreEqual(asteroide.Fecha, asteroideEjemplo.Fecha);
         }
-        //TODO: Todo lo que no sea un TEST, no debe ir en una clase/archivo de tests, esta lógica está bien pero extráela
-        /// <summary>
-        /// Metodo que crea un objeto Asteroide
-        /// </summary>
-        /// <returns>Retorna un objeto Asteroide</returns>
-        private Asteroide GetAsteroideDeEjemplo() {
-            Asteroide asteroide = new Asteroide()
-            {
-                Nombre = "467460 (2006 JF42)",
-                Diametro = CalcularDiametroMedio((float)0.407901194, (float)0.912094798),
-                Velocidad = (float)99331.0754164726,
-                Fecha = DateTime.Parse("2023-05-11"),
-                Planeta = "Earth"
-            };
-            return asteroide;
-        }
-        /// <summary>
-        /// Calcula la media del Diametro
-        /// </summary>
-        /// <param name="min">Diametro mínimo</param>
-        /// <param name="max">Diametro máximo</param>
-        /// <returns>Retorna un double que representa la media del diametro minimo y maximo</returns>
-        private static double CalcularDiametroMedio(float min, float max)
-        {
-            float diametroMedio = (max + min) / 2;
-            return diametroMedio;
-        }
-
-        /// <summary>
-        /// Método que crea un objeto ApiModelo de ejemplo
-        /// </summary>
-        /// <returns>Retorna un objeto ApiModelo</returns>
-        private ApiModel GetApiModeloEjemplo()
-        {
-            ApiModel model = new ApiModel()
-            {
-                Name = "467460 (2006 JF42)",
-                Estimated_Diameter = new Estimated_Diameter()
-                {
-                    Kilometers = new Kilometers()
-                    {
-                        Estimated_diameter_min = (float)0.407901194,
-                        Estimated_diameter_max = (float)0.912094798
-                    },
-                },
-                Is_potentially_hazardous_asteroid = true,
-                Close_approach_data = new List<Element>()
-                {
-                    new Element()
-                    {
-                        Close_approach_date = DateTime.Parse("2023-05-11"),
-                        Relative_velocity = new Relative_velocity()
-                        {
-                            Kilometers_per_second = (float)10,
-                            Kilometers_per_hour = (float)99331.0754164726,
-                            Miles_per_hour =(float) 22369.5
-                        },
-                        Orbiting_body = "Earth"
-                    }
-                }
-
-            };
-            return model;
-        }
+        
     }
 
 }

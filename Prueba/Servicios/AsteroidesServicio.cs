@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using Prueba.Modelos;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Prueba.Servicios
 {
-    //TODO: aquí lo mismo, hay 2 clases en 1 archivo
-    public interface IAsteroidesServicio {
-        List<Asteroide> GetAsteroides(string json);
-    }
     public class AsteroidesServicio:IAsteroidesServicio
     {
         private readonly IParseToServicio _parseToServicio;
@@ -52,7 +49,8 @@ namespace Prueba.Servicios
             }
 
 
-            return asteroides;
+
+            return asteroides.OrderByDescending(x => x.Diametro).Take(3).ToList();
         }
     }
 }
