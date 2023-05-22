@@ -3,6 +3,7 @@ using Prueba.Servicios;
 using Prueba.Controllers;
 using Prueba.Modelos;
 using Moq;
+using Moq.Protected;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Reflection;
 using System.Linq;
 using System.Net.Http;
 using System.Net;
+using System.Threading;
 
 namespace TestMock
 {
@@ -27,7 +29,8 @@ namespace TestMock
         Mock<IPeticionServicio> peticionServicio;
         Mock<IAsteroidesServicio> asteroidesServicio;
         Mock<IParseToServicio> parseToServicio;
-        Mock<HttpClient> httpClient;
+        Mock<HttpMessageHandler> httpMessageHandler;
+        HttpClient httpClient;
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
 
         //TODO: Está bien, pero falta mockear el httpClient del servicio para ver como funciona ese servicio con json falso de la nasa
@@ -36,7 +39,8 @@ namespace TestMock
             peticionServicio = new Mock<IPeticionServicio>();
             asteroidesServicio = new Mock<IAsteroidesServicio>();
             parseToServicio = new Mock<IParseToServicio>();
-            httpClient = new Mock<HttpClient>();
+            httpMessageHandler = new Mock<HttpMessageHandler>();
+
         }
 
         /// <summary>
@@ -44,7 +48,8 @@ namespace TestMock
         /// </summary>
         /// <returns></returns>
         [TestMethod]
-        public async Task PruebaAsteroideControllerFailDias() {
+        public async Task PruebaAsteroideControllerFailDias()
+        {
             int dias = 10;
 
             AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
@@ -62,34 +67,41 @@ namespace TestMock
         /// Simula la llamada del metodo Realizar petición, que devuelve una respuesta Ok con el json falso de la nasa
         /// </summary>
         /// <returns></returns>
-        //[TestMethod]
-        //public async Task PruebaPeticionServicioHttpClient() {
-        //    string archivo = File.ReadAllText(_rutaJson);
-        //    int dias = 2;
-        //    httpClient.Setup(s=>s.GetAsync(It.IsAny<string>())).ReturnsAsync(new HttpResponseMessage()
-        //    {
-        //        StatusCode = HttpStatusCode.OK,
-        //        Content = new StringContent(archivo)
-        //    });
+        [TestMethod]
+        public async Task PruebaPeticionServicioHttpClient()
+        {
+            string archivo = File.ReadAllText(_rutaJson);//Json falso
+            int dias = 2;
+            //no se puede mockear directamente la clase HttpClient, asi que mockeamos el HttpMessageHandler para utilizarlo en un objeto HttpClient
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+                ).ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(archivo)
+                });
 
-        //    var servicio = new PeticionServicio();
-        //    servicio.GetType().GetField("httpClient", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(servicio, httpClient.Object);
+            httpClient = new HttpClient(httpMessageHandler.Object);
 
-        //    var response = await servicio.RealizarPeticion(dias, _url);
-        //    httpClient.Verify();
-        //    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var servicio = new PeticionServicio();
+            var response = await servicio.RealizarPeticion(dias, _url, httpClient);
+            httpMessageHandler.Verify();
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
-        //}
+        }
 
         /// <summary>
         /// Simula una llamada a la Api de la Nasa y esta retorna un StatusCode != 200
         /// </summary>
         /// <returns></returns>
         [TestMethod]
-        public async Task PruebaAsteroideControllerFailApiNasa() {
+        public async Task PruebaAsteroideControllerFailApiNasa()
+        {
             int dias = 7;
             string archivo = File.ReadAllText(_rutaJson);
-            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url)).ReturnsAsync(new HttpResponseMessage()
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url, It.IsAny<HttpClient>())).ReturnsAsync(new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Content = new StringContent(JsonConvert.SerializeObject(new
@@ -123,8 +135,7 @@ namespace TestMock
 
             int dias = 7;
             string archivo = File.ReadAllText(_rutaJson);
-
-            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url)).ReturnsAsync(new HttpResponseMessage()
+            peticionServicio.Setup(s => s.RealizarPeticion(It.IsAny<int>(), _url, It.IsAny<HttpClient>())).ReturnsAsync(new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(archivo)
@@ -139,7 +150,7 @@ namespace TestMock
                 Fecha = modelo.Close_approach_data[0].Close_approach_date,
                 Planeta = modelo.Close_approach_data[0].Orbiting_body
             });
-            
+
             asteroidesServicio.Setup(a => a.GetAsteroides(It.IsAny<string>())).Returns(UtilidadesMock.GetAsteroidesDePrueba());
 
             AsteroidsController asteriods = new AsteroidsController(peticionServicio.Object, asteroidesServicio.Object);
@@ -158,6 +169,6 @@ namespace TestMock
 
         }
 
-        
+
     }
 }

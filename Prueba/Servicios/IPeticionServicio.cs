@@ -6,6 +6,6 @@ namespace Prueba.Servicios
     public interface IPeticionServicio
     {
         
-        Task<HttpResponseMessage> RealizarPeticion(int dias, string url);
+        Task<HttpResponseMessage> RealizarPeticion(int dias, string url, HttpClient httpClient);
     }
 }

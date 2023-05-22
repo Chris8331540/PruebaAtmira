@@ -24,6 +24,7 @@ namespace Prueba.Controllers
 
         private readonly IPeticionServicio _peticionServicio;
         private readonly IAsteroidesServicio _asteroidesServicio;
+        private HttpClient httpClient;
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
         public AsteroidsController(IPeticionServicio peticionServicio, IAsteroidesServicio asteroidesServicio)
         {
@@ -53,11 +54,10 @@ namespace Prueba.Controllers
                     StatusCode = 400
                 };
             }
-            //TODO: contempla también la posibilidad de que la api de la nasa devuelva una lista vacía, en ese caso el statuscode es positivo pero no es 200,
-            //investiga el status code para una respuesta correcta pero vacía
 
             //recibo el response de la petición a la api de la Nasa
-            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
+            httpClient = new HttpClient();
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url, httpClient);
             if (response.IsSuccessStatusCode)//si recibo una respuesta válida continuo la operacion normal
             {
                 List<Asteroide> asteroides = _asteroidesServicio.GetAsteroides(await response.Content.ReadAsStringAsync());

@@ -16,7 +16,7 @@ namespace Prueba.Servicios
 {
     public class PeticionServicio : IPeticionServicio
     {
-        private static HttpClient httpClient = new HttpClient();
+        
         
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Prueba.Servicios
         /// <param name="dias">Cantidad de días</param>
         /// <param name="url">Url de la petición</param>
         /// <returns>Devuelve un objeto HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> RealizarPeticion(int dias, string url)
+        public async Task<HttpResponseMessage> RealizarPeticion(int dias, string url, HttpClient httpClient)
         {
             DateTime hoy = DateTime.Now;
             DateTime fechaFinal = hoy.AddDays(dias);

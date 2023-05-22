@@ -25,12 +25,14 @@ namespace PruebaUnitariaMsTest
         private readonly AsteroidsController asteroids;
         private static readonly string _url = "https://api.nasa.gov/neo/rest/v1/feed?";
         private static readonly string _urlFail = "https://api.nasa.gov/neo/rest/v1/";
+        private static HttpClient _httpClient;
         public MsTest()
         {
             _peticionServicio = new PeticionServicio();
             _parseToServicio = new ParseToServicio();
             _asteroidesServicio = new AsteroidesServicio(_parseToServicio);
             asteroids = new AsteroidsController(_peticionServicio, _asteroidesServicio);
+            _httpClient = new HttpClient();
         }
 
 
@@ -40,7 +42,7 @@ namespace PruebaUnitariaMsTest
         /// <param name="dias">Cantidad de dias</param>
         /// <returns></returns>
         [TestMethod]
-        [DataRow(1)]
+        [DataRow(5)]
         public async Task ComprobarControladorPeticionCorrecta(int dias)
         {
             ContentResult response = (ContentResult)await asteroids.Get(dias);
@@ -70,7 +72,7 @@ namespace PruebaUnitariaMsTest
         [TestMethod]
         [DataRow(2)]
         public async Task ComprobarPeticionApiNasa(int dias) {
-            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url);
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _url, _httpClient);
             Assert.AreEqual(200, (int)response.StatusCode);
 
         }
@@ -84,7 +86,7 @@ namespace PruebaUnitariaMsTest
         [DataRow(2)]
         public async Task ComprobarPeticionApiNasaFail(int dias)
         {
-            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _urlFail);
+            HttpResponseMessage response = await _peticionServicio.RealizarPeticion(dias, _urlFail, _httpClient);
             Assert.AreNotEqual(200, (int)response.StatusCode);
 
         }
